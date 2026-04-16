@@ -1,13 +1,12 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 
 from app.core.config import settings
-from app.schemas.responses.health_response import HealthResponse
 from app.schemas.requests.quotation_analysis_request import QuotationAnalysisRequest
 from app.services.analysis_service import AnalysisService
 
 router = APIRouter()
 
-# khởi tạo service 
+# khởi tạo service phân tích
 analysis_service = AnalysisService()
 
 @router.get("/analysis/{quote_id}")
@@ -17,25 +16,17 @@ async def get_quote_analysis(quote_id: str):
     if not analysis:
         return {
             "status": "pending",
-            "message": "đang xử lý hoặc id không tồn tại"
+            "message": "đang xử lý hoặc chưa có dữ liệu"
         }
     return {"status": "success", "analysis": analysis}
 
-@router.get("/health", response_model=HealthResponse)
-async def health_check():
-    # kiểm tra server
-    return {
-        "status": "healthy",
-        "version": settings.API_VERSION,
-    }
-
 @router.post("/analyze-quote")
 async def analyze_quote(request: QuotationAnalysisRequest, background_tasks: BackgroundTasks):
-    # nhận data, xử lý ngầm
+    # đẩy việc phân tích vào hàng đợi chạy ngầm
     background_tasks.add_task(analysis_service.process_quotation, request.model_dump())
     
     return {
         "status": "processing",
         "quote_id": request.quoteId,
-        "message": "đã nhận, đang xử lý ngầm"
+        "message": "đã nhận và đang xử lý"
     }
