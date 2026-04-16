@@ -3,12 +3,9 @@ from typing import Optional
 
 from app.core.config import settings
 
-
+# cổng giao tiếp với gemini
 class LLMClient:
-    """Client for communicating with LLM APIs (Gemini)."""
-
     def __init__(self):
-        """Initialize Gemini client."""
         genai.configure(api_key=settings.LLM_API_KEY)
         self.default_model_name = settings.LLM_MODEL
 
@@ -19,9 +16,6 @@ class LLMClient:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
     ) -> dict:
-        """
-        Call Gemini API with given prompt.
-        """
         model_name = model or self.default_model_name
         temp = temperature if temperature is not None else settings.TEMPERATURE
 
