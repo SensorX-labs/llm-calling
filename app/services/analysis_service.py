@@ -14,23 +14,32 @@ class AnalysisService:
     # xử lý phân tích báo giá
     async def process_quotation(self, data: dict):
         quote_id = data.get("quoteId")
-        try:
-            #  xây dựng promt theo mẫu
-            prompt = self.prompt_builder.build_quotation_prompt(data)
+        print(f"[*] bắt đầu phân tích cho id: {quote_id}")
 
-            # gọi gemini lấy kết quả
+        try:
+            # 1. xây dựng prompt
+            prompt = self.prompt_builder.build_quotation_prompt(data)
+            print("[*] đã dựng xong prompt cho ai")
+
+            # 2. gọi gemini
             result = await self.llm_client.complete(prompt=prompt, temperature=0.2)
             if result.get("status") == "error":
+                print(f"[!] lỗi kết nối gemini: {result.get('message')}")
                 return result
+            print("[*] đã nhận phản hồi từ gemini")
 
-            # parse json từ nội dung ai trả về
+            # 3. parse nội dung json
             content = result.get("content", "{}")
             analysis = json.loads(content)
+            print("[*] giải mã json thành công")
             
-            # lưu kết quả vào postgres
+            # 4. lưu vào database
             self.repository.upsert_analysis(quote_id, analysis)
+            print(f"[ok] đã lưu vào postgres thành công cho id: {quote_id}")
+
             return {"status": "success", "quote_id": quote_id, "analysis": analysis}
         except Exception as e:
+            print(f"[x] lỗi nghiêm trọng: {str(e)}")
             return {"status": "error", "message": str(e)}
 
     # lấy kết quả phân tích theo quote id

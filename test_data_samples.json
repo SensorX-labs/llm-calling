@@ -1,88 +1,71 @@
 {
-  "1_high_win_upsell_opportunity": {
-    "quoteId": "QUOTE-2024-001",
+  "1_an_toan": {
+    "quoteId": "TEST-SAFE-001",
     "customer": {
-      "isExisting": true,
-      "totalOrders": 25,
-      "lastOrderDaysAgo": 15,
-      "avgOrderValue": 50000000.0,
-      "paymentBehavior": "on_time",
-      "relationshipLevel": "high"
+      "isExisting": true, "totalOrders": 50, "lastOrderDaysAgo": 7, "avgOrderValue": 20000000.0, "paymentBehavior": "on_time", "relationshipLevel": "high"
     },
     "pricing": {
-      "totalAmount": 4500000.0,
-      "suggestedPrice": 5000000.0,
-      "floorPrice": 4000000.0,
+      "totalAmount": 15000000.0, "suggestedPrice": 15000000.0, "floorPrice": 10000000.0, 
       "priceTiers": [
-        {"quantity": 10, "price": 500000.0},
-        {"quantity": 50, "price": 450000.0},
-        {"quantity": 100, "price": 400000.0}
-      ],
-      "discountPercent": 10.0,
-      "avgMargin": 25.0,
-      "priceCompetitiveness": "high"
+        {"quantity": 1, "price": 1500000.0}
+      ], 
+      "discountPercent": 0.0, "avgMargin": 25.0, "priceCompetitiveness": "high"
     },
-    "quote": {
-      "itemCount": 3,
-      "totalItemCount": 45,
-      "hasAlternativeOptions": false,
-      "hasBundle": true,
-      "complexity": "low"
-    },
-    "context": {
-      "urgency": "high",
-      "competition": false,
-      "customerRequestedQuote": true,
-      "deadlineDays": 1
-    },
-    "sales": {
-      "experienceYears": 5,
-      "winRate": 0.6,
-      "recentPerformance": "up"
-    },
-    "customerMessage": "Chúng tôi cần khoảng 45 cái, giao gấp trong hôm nay."
+    "quote": { "itemCount": 2, "totalItemCount": 10, "hasAlternativeOptions": false, "hasBundle": true, "complexity": "low" },
+    "context": { "urgency": "low", "competition": false, "customerRequestedQuote": true, "deadlineDays": 7 },
+    "sales": { "experienceYears": 10, "winRate": 0.9, "recentPerformance": "up" },
+    "customerMessage": "Lấy như mọi khi nhé em."
   },
-  "2_high_risk_tier_violation": {
-    "quoteId": "QUOTE-2024-002",
+  "2_rui_ro": {
+    "quoteId": "TEST-RISKY-002",
     "customer": {
-      "isExisting": false,
-      "totalOrders": 0,
-      "lastOrderDaysAgo": 0,
-      "avgOrderValue": 0.0,
-      "paymentBehavior": "unknown",
-      "relationshipLevel": "low"
+      "isExisting": true, "totalOrders": 5, "lastOrderDaysAgo": 180, "avgOrderValue": 5000000.0, "paymentBehavior": "late", "relationshipLevel": "low"
     },
     "pricing": {
-      "totalAmount": 100000000.0,
-      "suggestedPrice": 120000000.0,
-      "floorPrice": 90000000.0,
+      "totalAmount": 9200000.0, "suggestedPrice": 10000000.0, "floorPrice": 9000000.0, 
       "priceTiers": [
-        {"quantity": 10, "price": 12000000.0},
-        {"quantity": 50, "price": 10000000.0},
-        {"quantity": 100, "price": 9000000.0}
-      ],
-      "discountPercent": 2.0,
-      "avgMargin": 8.0,
-      "priceCompetitiveness": "low"
+        {"quantity": 1, "price": 200000.0}
+      ], 
+      "discountPercent": 8.0, "avgMargin": 5.0, "priceCompetitiveness": "low"
     },
-    "quote": {
-      "itemCount": 25,
-      "totalItemCount": 5,
-      "hasAlternativeOptions": false,
-      "hasBundle": false,
-      "complexity": "high"
+    "quote": { "itemCount": 10, "totalItemCount": 50, "hasAlternativeOptions": true, "hasBundle": false, "complexity": "high" },
+    "context": { "urgency": "high", "competition": true, "customerRequestedQuote": true, "deadlineDays": 1 },
+    "sales": { "experienceYears": 1, "winRate": 0.2, "recentPerformance": "down" },
+    "customerMessage": "Bên khác báo rẻ hơn nhiều, có giảm thêm được không?"
+  },
+  "3_canh_bao_lo": {
+    "quoteId": "TEST-LOSS-003",
+    "customer": {
+      "isExisting": false, "totalOrders": 0, "lastOrderDaysAgo": 0, "avgOrderValue": 0.0, "paymentBehavior": "unknown", "relationshipLevel": "low"
     },
-    "context": {
-      "urgency": "low",
-      "competition": true,
-      "customerRequestedQuote": false,
-      "deadlineDays": 14
+    "pricing": {
+      "totalAmount": 8000000.0, "suggestedPrice": 10000000.0, "floorPrice": 9000000.0, 
+      "priceTiers": [
+        {"quantity": 1, "price": 500000.0}
+      ], 
+      "discountPercent": 20.0, "avgMargin": -5.0, "priceCompetitiveness": "high"
     },
-    "sales": {
-      "experienceYears": 1,
-      "winRate": 0.15,
-      "recentPerformance": "down"
+    "quote": { "itemCount": 5, "totalItemCount": 20, "hasAlternativeOptions": false, "hasBundle": false, "complexity": "medium" },
+    "context": { "urgency": "high", "competition": true, "customerRequestedQuote": true, "deadlineDays": 2 },
+    "sales": { "experienceYears": 2, "winRate": 0.3, "recentPerformance": "stable" },
+    "customerMessage": "Giá này anh duyệt luôn, không cần hỏi lại."
+  },
+  "4_tiem_nang_upsell": {
+    "quoteId": "TEST-UPSELL-004",
+    "customer": {
+      "isExisting": true, "totalOrders": 15, "lastOrderDaysAgo": 30, "avgOrderValue": 10000000.0, "paymentBehavior": "on_time", "relationshipLevel": "medium"
     },
-    "customerMessage": "Đang khảo giá, ưu tiên bên nào rẻ nhất."
+    "pricing": {
+      "totalAmount": 9000000.0, "suggestedPrice": 10000000.0, "floorPrice": 8500000.0, 
+      "priceTiers": [
+        {"quantity": 1, "price": 100000.0},
+        {"quantity": 100, "price": 85000.0}
+      ], 
+      "discountPercent": 10.0, "avgMargin": 12.0, "priceCompetitiveness": "medium"
+    },
+    "quote": { "itemCount": 1, "totalItemCount": 95, "hasAlternativeOptions": true, "hasBundle": false, "complexity": "low" },
+    "context": { "urgency": "medium", "competition": false, "customerRequestedQuote": true, "deadlineDays": 5 },
+    "sales": { "experienceYears": 5, "winRate": 0.5, "recentPerformance": "stable" },
+    "customerMessage": "Anh mua 95 cái, bớt thêm tí nữa cho tròn tiền nhé."
   }
 }

@@ -7,7 +7,7 @@ from app.core.config import settings
 class LLMClient:
     def __init__(self):
         genai.configure(api_key=settings.LLM_API_KEY)
-        self.default_model_name = settings.LLM_MODEL
+        self.default_model_name = "gemini-3-flash-preview"
 
     async def complete(
         self,

@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     # kết nối gemini
     LLM_API_KEY: str = ""
-    LLM_MODEL: str = "gemini-2.5-flash"
+    LLM_MODEL: str = "gemini-3-flash-preview"
     LLM_API_BASE: str = "https://generativelanguage.googleapis.com/v1beta"
     LLM_TIMEOUT: int = 30
 

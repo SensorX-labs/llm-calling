@@ -48,21 +48,16 @@ class PromptBuilder:
 
           {'6. TIN NHẮN TỪ KHÁCH HÀNG: "' + data.get('customerMessage') + '"' if data.get('customerMessage') else ''}
 
-          ### Yêu Cầu Phân Tích (Ngắn gọn & Trực diện):
-          1. Phân tích Negotiation Room (Dư địa đàm phán) dựa trên giá sàn và giá đang chào.
-          2. Kiểm tra Price Tiers và tìm cơ hội bán thêm (Upsell).
-          3. Đưa ra tối đa 3 insight quan trọng và 3 hành động cụ thể cho Sales.
-          4. Sử dụng ngôn ngữ quyết đoán, chuyên nghiệp.
+          ### Yêu Cầu Phân Tích (Sắc bén & Logic):
+          1. Phân loại thương vụ (deal_status) vào 1 trong 4 mốc: An toàn | Rủi ro | Lỗ | Tiềm năng Upsell.
+          2. Reasoning: Giải thích ngắn gọn và thuyết phục tại sao lại chọn trạng thái đó (dựa trên biên lợi nhuận, giá sàn, lịch sử khách hàng hoặc đối thủ).
+          3. Strategy: Đưa ra chiến lược đàm phán và cơ hội bán thêm (upsell) tối ưu nhất để Sales tham khảo.
 
-          Trả về kết quả duy nhất dưới định dạng JSON sau:
+          Trả về JSON:
           {{
-            "win_probability": "0-100%",
-            "risk_score": "low/medium/high",
-            "negotiation_room": "ngắn gọn trong 1 câu",
-            "upsell_opportunity": "ngắn gọn trong 1 câu (nếu có)",
-            "key_insights": ["tối đa 3 ý cực ngắn"],
-            "recommendations": ["tối đa 3 hành động cụ thể"],
-            "suggested_next_step": "1 hành động duy nhất"
+            "deal_status": "An toàn | Rủi ro | Lỗ | Tiềm năng Upsell",
+            "reasoning": "đoạn lập luận giải thích nguyên nhân dẫn đến status trên",
+            "strategy": "chiến lược đàm phán và upsell"
           }}
           """
         return prompt.strip()
