@@ -1,0 +1,88 @@
+{
+  "1_high_win_upsell_opportunity": {
+    "quoteId": "QUOTE-2024-001",
+    "customer": {
+      "isExisting": true,
+      "totalOrders": 25,
+      "lastOrderDaysAgo": 15,
+      "avgOrderValue": 50000000.0,
+      "paymentBehavior": "on_time",
+      "relationshipLevel": "high"
+    },
+    "pricing": {
+      "totalAmount": 4500000.0,
+      "suggestedPrice": 5000000.0,
+      "floorPrice": 4000000.0,
+      "priceTiers": [
+        {"quantity": 10, "price": 500000.0},
+        {"quantity": 50, "price": 450000.0},
+        {"quantity": 100, "price": 400000.0}
+      ],
+      "discountPercent": 10.0,
+      "avgMargin": 25.0,
+      "priceCompetitiveness": "high"
+    },
+    "quote": {
+      "itemCount": 3,
+      "totalItemCount": 45,
+      "hasAlternativeOptions": false,
+      "hasBundle": true,
+      "complexity": "low"
+    },
+    "context": {
+      "urgency": "high",
+      "competition": false,
+      "customerRequestedQuote": true,
+      "deadlineDays": 1
+    },
+    "sales": {
+      "experienceYears": 5,
+      "winRate": 0.6,
+      "recentPerformance": "up"
+    },
+    "customerMessage": "Chúng tôi cần khoảng 45 cái, giao gấp trong hôm nay."
+  },
+  "2_high_risk_tier_violation": {
+    "quoteId": "QUOTE-2024-002",
+    "customer": {
+      "isExisting": false,
+      "totalOrders": 0,
+      "lastOrderDaysAgo": 0,
+      "avgOrderValue": 0.0,
+      "paymentBehavior": "unknown",
+      "relationshipLevel": "low"
+    },
+    "pricing": {
+      "totalAmount": 100000000.0,
+      "suggestedPrice": 120000000.0,
+      "floorPrice": 90000000.0,
+      "priceTiers": [
+        {"quantity": 10, "price": 12000000.0},
+        {"quantity": 50, "price": 10000000.0},
+        {"quantity": 100, "price": 9000000.0}
+      ],
+      "discountPercent": 2.0,
+      "avgMargin": 8.0,
+      "priceCompetitiveness": "low"
+    },
+    "quote": {
+      "itemCount": 25,
+      "totalItemCount": 5,
+      "hasAlternativeOptions": false,
+      "hasBundle": false,
+      "complexity": "high"
+    },
+    "context": {
+      "urgency": "low",
+      "competition": true,
+      "customerRequestedQuote": false,
+      "deadlineDays": 14
+    },
+    "sales": {
+      "experienceYears": 1,
+      "winRate": 0.15,
+      "recentPerformance": "down"
+    },
+    "customerMessage": "Đang khảo giá, ưu tiên bên nào rẻ nhất."
+  }
+}

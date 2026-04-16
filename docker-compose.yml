@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # 1. Cơ sở dữ liệu PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: ai_service_db
+    restart: always
+    environment:
+      POSTGRES_USER: user_admin
+      POSTGRES_PASSWORD: password_123
+      POSTGRES_DB: quote_analysis
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. Message Broker RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: ai_service_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   # Cổng giao tiếp app
+      - "15672:15672" # Cổng UI quản lý (guest/guest)
+
+volumes:
+  postgres_data:

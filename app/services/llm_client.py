@@ -1,18 +1,16 @@
-"""LLM client service for API calls."""
+import google.generativeai as genai
 from typing import Optional
 
 from app.core.config import settings
 
 
 class LLMClient:
-    """Client for communicating with LLM APIs."""
+    """Client for communicating with LLM APIs (Gemini)."""
 
     def __init__(self):
-        """Initialize LLM client."""
-        self.api_key = settings.LLM_API_KEY
-        self.model = settings.LLM_MODEL
-        self.api_base = settings.LLM_API_BASE
-        self.timeout = settings.LLM_TIMEOUT
+        """Initialize Gemini client."""
+        genai.configure(api_key=settings.LLM_API_KEY)
+        self.default_model_name = settings.LLM_MODEL
 
     async def complete(
         self,
@@ -22,26 +20,34 @@ class LLMClient:
         max_tokens: Optional[int] = None,
     ) -> dict:
         """
-        Call LLM API with given prompt.
-
-        Args:
-            prompt: The prompt to send
-            model: Model to use (optional)
-            temperature: Temperature setting (optional)
-            max_tokens: Max tokens in response (optional)
-
-        Returns:
-            Dictionary with response data
+        Call Gemini API with given prompt.
         """
-        model = model or self.model
-        temperature = temperature if temperature is not None else settings.TEMPERATURE
-        max_tokens = max_tokens or settings.MAX_TOKENS
+        model_name = model or self.default_model_name
+        temp = temperature if temperature is not None else settings.TEMPERATURE
 
-        # TODO: Implement actual API call
-        # This is a placeholder for the actual LLM API integration
-        return {
-            "status": "success",
-            "content": "LLM response placeholder",
-            "model": model,
-            "tokens_used": 100,
-        }
+        try:
+            # Sử dụng các tham số trực tiếp và bật JSON mode
+            model_instance = genai.GenerativeModel(model_name)
+            
+            response = await model_instance.generate_content_async(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=temp,
+                    response_mime_type="application/json",
+                )
+            )
+
+            if not response.text:
+                return {"status": "error", "message": "Gemini không trả về nội dung"}
+
+            return {
+                "status": "success",
+                "content": response.text,
+                "model": model_name
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "model": model_name
+            }

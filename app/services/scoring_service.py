@@ -27,8 +27,6 @@ class ScoringService:
         if not content:
             return {"score": 0.0, "details": {"error": "Empty content"}}
 
-        # TODO: Implement actual scoring logic
-        # This is a placeholder for the actual scoring implementation
         score = self._calculate_placeholder_score(content)
 
         return {
@@ -49,7 +47,6 @@ class ScoringService:
         Returns:
             Score between 0 and 1
         """
-        # Simple placeholder: longer content scores higher (0-1)
         max_length = 1000
         return min(len(content) / max_length, 1.0)
 

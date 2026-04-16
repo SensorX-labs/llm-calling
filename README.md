@@ -1,107 +1,104 @@
-# LLM Calling Service
+# 🚀 Quote Analysis Service (LLM-Based)
 
-FastAPI service for calling Large Language Models with support for prompt building and content scoring.
+Dịch vụ phân tích báo giá thông minh sử dụng **Google Gemini 2.5 Flash**. Hệ thống sử dụng phương pháp **Feature Engineering for LLMs** để đánh giá tỷ lệ chốt đơn (Win Probability) và đưa ra các chỉ dẫn chiến lược cho bộ phận Sales.
 
-## Project Structure
+## 🛠 Tech Stack
+- **Backend:** FastAPI (Python)
+- **LLM:** Google Gemini 2.5 Flash (Generative AI)
+- **Validation:** Pydantic V2
+- **Config:** Pydantic Settings
 
-```
-app/
-├── main.py                 # FastAPI application entry point
-├── api/
-│   └── routes.py          # API endpoint definitions
-├── schemas/
-│   ├── request.py         # Request data models
-│   └── response.py        # Response data models
-├── services/
-│   ├── llm_client.py      # LLM API client
-│   ├── prompt_builder.py  # Prompt construction utility
-│   └── scoring_service.py # Content scoring service
-└── core/
-    └── config.py          # Configuration management
+## 📥 Cài đặt & Chạy ứng dụng
 
-requirements.txt  # Project dependencies
-.env             # Environment variables (not in version control)
-```
-
-## Setup
-
-1. **Install dependencies:**
+1. **Cài đặt thư viện:**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Configure environment:**
-   - Copy `.env` file and add your API keys and settings
-   - Update `LLM_API_KEY` with your LLM provider credentials
-
-3. **Run the service:**
-   ```bash
-   python -m uvicorn app.main:app --reload
+2. **Cấu hình API Key:**
+   Mở file `.env` và điền Gemini API Key của bạn:
+   ```env
+   LLM_API_KEY=your_key_here
+   LLM_MODEL=gemini-2.5-flash
    ```
 
-   The API will be available at `http://localhost:8000`
-   - Interactive API docs: `http://localhost:8000/docs`
-   - ReDoc documentation: `http://localhost:8000/redoc`
+3. **Khởi chạy Server:**
+   ```bash
+   python -m app.main
+   ```
+   Server sẽ chạy tại: `http://127.0.0.1:8000`
 
-## API Endpoints
+## 📡 API Endpoints
 
-### Health Check
-- **GET** `/api/v1/health` - Service health status
+### 1. Phân tích báo giá chuyên sâu
+- **Endpoint:** `POST /api/v1/analyze-quote`
+- **Mục tiêu:** Nhận dữ liệu đặc trưng (Features) của báo giá và trả về phân tích từ AI.
 
-### LLM Completion
-- **POST** `/api/v1/llm/complete` - Complete a prompt
-  - **Body:**
-    ```json
-    {
-      "prompt": "Your prompt here",
-      "model": "gpt-4",
-      "temperature": 0.7,
-      "max_tokens": 2000
-    }
-    ```
+#### Request Body (Dữ liệu đầu vào):
+Hệ thống yêu cầu 5 nhóm dữ liệu chính:
+- **`customer`**: Thông tin hành vi và lịch sử khách hàng.
+- **`pricing`**: Các chỉ số về giá, lợi nhuận và tính cạnh tranh.
+- **`quote`**: Cấu trúc và độ phức tạp của báo giá.
+- **`context`**: Bối cảnh mục tiêu (độ gấp, đối thủ).
+- **`sales`**: Năng lực và phong độ của nhân viên kinh doanh.
 
-### Content Scoring
-- **POST** `/api/v1/score` - Score content
-  - **Body:**
-    ```json
-    {
-      "content": "Content to score",
-      "scoring_type": "quality"
-    }
-    ```
-
-### Completion with Context
-- **POST** `/api/v1/llm/complete-with-context` - Complete with context
-  - Same as `/api/v1/llm/complete`
-
-## Configuration
-
-Environment variables in `.env`:
-- `LLM_API_KEY` - API key for LLM provider
-- `LLM_MODEL` - Default model to use (default: gpt-4)
-- `LLM_API_BASE` - LLM API base URL
-- `LLM_TIMEOUT` - Request timeout in seconds
-- `MAX_TOKENS` - Default max tokens for responses
-- `TEMPERATURE` - Default temperature for generation
-- `DEBUG` - Enable debug mode (default: False)
-
-## Development
-
-### Add new endpoints:
-1. Create request/response schemas in `app/schemas/`
-2. Add route handlers in `app/api/routes.py`
-3. Implement business logic in `app/services/`
-
-### Testing:
-```bash
-pytest
+#### Ví dụ Request:
+```json
+{
+  "customer": {
+    "isExisting": true,
+    "totalOrders": 12,
+    "lastOrderDaysAgo": 30,
+    "avgOrderValue": 12000000,
+    "paymentBehavior": "on_time",
+    "relationshipLevel": "medium"
+  },
+  "pricing": {
+    "totalAmount": 15000000,
+    "discountPercent": 5,
+    "avgMargin": 12,
+    "priceCompetitiveness": "medium"
+  },
+  "quote": {
+    "itemCount": 5,
+    "hasAlternativeOptions": true,
+    "hasBundle": false,
+    "complexity": "low"
+  },
+  "context": {
+    "urgency": "high",
+    "competition": true,
+    "customerRequestedQuote": true,
+    "deadlineDays": 2
+  },
+  "sales": {
+    "experienceYears": 3,
+    "winRate": 0.4,
+    "recentPerformance": "stable"
+  },
+  "customerMessage": "Sếp mình đang cần gấp trong tuần!"
+}
 ```
 
-## Next Steps
+#### Response (Kết quả từ AI):
+```json
+{
+  "status": "success",
+  "analysis": {
+    "win_probability": "75%",
+    "risk_score": "medium",
+    "key_insights": ["..."],
+    "recommendations": ["..."],
+    "suggested_next_step": "..."
+  }
+}
+```
 
-- [ ] Implement actual LLM API integration in `llm_client.py`
-- [ ] Add authentication and authorization
-- [ ] Implement caching for responses
-- [ ] Add logging and monitoring
-- [ ] Write unit and integration tests
-- [ ] Deploy to production environment
+## 🧠 Nguyên tắc Feature cho LLM
+Dự án áp dụng nguyên tắc **Semantic Labels**:
+- Ưu tiên các nhãn có nghĩa (`high`, `medium`, `low`) thay vì các chỉ số thuần túy.
+- Tập trung vào dữ liệu mà AI có thể suy luận logic (Reasoning).
+- Loại bỏ các ID và dữ liệu rác không đóng góp vào phân tích.
+
+---
+*Created by Antigravity AI Assistant.*
