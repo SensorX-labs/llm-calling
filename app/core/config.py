@@ -1,30 +1,30 @@
-"""Configuration module for LLM service."""
+# quản lý cấu hình hệ thống
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Application settings."""
+    # đọc thiết lập từ .env hoặc môi trường
 
-    # API
-    API_TITLE: str = "LLM Calling Service"
+    # api fastapi
+    API_TITLE: str = "ai analysis service"
     API_VERSION: str = "1.0.0"
     DEBUG: bool = False
 
-    # LLM Configuration
+    # kết nối gemini
     LLM_API_KEY: str = ""
     LLM_MODEL: str = "gemini-2.5-flash"
     LLM_API_BASE: str = "https://generativelanguage.googleapis.com/v1beta"
     LLM_TIMEOUT: int = 30
 
-    # Service Configuration
+    # tham số ai
     MAX_TOKENS: int = 2000
     TEMPERATURE: float = 0.7
 
-    # RabbitMQ Configuration
+    # rabbitmq
     RABBITMQ_URL: str = "amqp://guest:guest@localhost/"
     RABBITMQ_QUEUE: str = "quotation.analyze"
 
-    # Database Configuration
+    # postgresql
     DATABASE_URL: str = "postgresql://user_admin:password_123@localhost:5432/quote_analysis"
 
     class Config:
@@ -32,4 +32,5 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 
+# đối tượng dùng chung toàn app
 settings = Settings()

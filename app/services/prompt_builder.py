@@ -1,63 +1,26 @@
-"""Prompt building service."""
-from typing import Dict, List, Optional
-
-
 class PromptBuilder:
-    """Build and format prompts for LLM."""
-
-    def __init__(self):
-        """Initialize prompt builder."""
-        self.system_prompt: Optional[str] = None
-        self.template_vars: Dict[str, str] = {}
-
-    def set_system_prompt(self, prompt: str) -> "PromptBuilder":
-        """Set system prompt."""
-        self.system_prompt = prompt
-        return self
-
-    def add_variables(self, variables: Dict[str, str]) -> "PromptBuilder":
-        """Add template variables."""
-        self.template_vars.update(variables)
-        return self
-
-    def build(self, user_prompt: str) -> str:
-        """
-        Build final prompt.
-
-        Args:
-            user_prompt: User input prompt
-
-        Returns:
-            Formatted prompt string
-        """
-        prompt = user_prompt
-
-        # Substitute template variables
-        for key, value in self.template_vars.items():
-            prompt = prompt.replace(f"{{{key}}}", value)
-
-        return prompt
+    """Lớp chịu trách nhiệm chuyển đổi dữ liệu thô thành câu lệnh thông minh (Prompt) cho AI."""
 
     def build_quotation_prompt(self, data: dict) -> str:
         """
-        Convert structured quotation JSON to a descriptive prompt.
+        Tạo ra một Prompt chi tiết bằng tiếng Việt để gửi cho Gemini.
+        Prompt này bao gồm ngữ cảnh kinh doanh và các yêu cầu phân tích cụ thể.
         """
-        customer = data.get("customer", {})
-        pricing = data.get("pricing", {})
-        quote = data.get("quote", {})
-        context = data.get("context", {})
-        sales = data.get("sales", {})
+        customer = data.get('customer', {})
+        pricing = data.get('pricing', {})
+        quote = data.get('quote', {})
+        context = data.get('context', {})
+        sales = data.get('sales', {})
 
         prompt = f"""
-Hãy đóng vai một chuyên gia phân tích kinh doanh cao cấp. Dựa trên dữ liệu dưới đây, hãy đánh giá tỷ lệ chốt đơn (Win Probability) và đưa ra các lời khuyên chiến lược.
+Hãy đóng vai một chuyên gia phân tích kinh doanh cao cấp và cố vấn chiến lược bán hàng. 
+Nhiệm vụ của bạn là phân tích bản báo giá dưới đây và đưa ra dự báo về khả năng thành công (Win Probability) cũng như các lời khuyên thực chiến.
 
-### THÔNG TIN CHI TIẾT:
+DƯ LIỆU BÁO GIÁ:
 
 1. KHÁCH HÀNG:
-- Loại khách: {'Khách cũ' if customer.get('isExisting') else 'Khách mới'}
-- Tổng số đơn đã mua: {customer.get('totalOrders')} đơn
-- Đơn cuối cùng: {customer.get('lastOrderDaysAgo')} ngày trước
-- Giá trị đơn trung bình: {customer.get('avgOrderValue'):,} VNĐ
+- Khách hàng cũ: {'Có' if customer.get('isExisting') else 'Không'}
+- Tổng số đơn đã đặt: {customer.get('totalOrders')} đơn
 - Hành vi thanh toán: {customer.get('paymentBehavior')}
 - Mức độ thân thiết: {customer.get('relationshipLevel')}
 
@@ -73,31 +36,30 @@ Hãy đóng vai một chuyên gia phân tích kinh doanh cao cấp. Dựa trên 
 
 3. CẤU TRÚC BÁO GIÁ:
 - Số lượng hạng mục: {quote.get('itemCount')} mục
-- Tổng số lượng sản phẩm: {sum([v for v in data.get('quote', {}).values() if isinstance(v, (int, float))])} (Lưu ý: Đối chiếu với Price Tiers)
+- Tổng số lượng sản phẩm: {sum([v for v in data.get('quote', {}).values() if isinstance(v, (int, float))])}
 - Có phương án thay thế: {'Có' if quote.get('hasAlternativeOptions') else 'Không'}
 - Có bán kèm (Bundle): {'Có' if quote.get('hasBundle') else 'Không'}
 - Độ phức tạp: {quote.get('complexity')}
 
-4. BỐI CẢNH (CONTEXT):
+4. NGỮ CẢNH THƯƠNG VỤ:
 - Độ khẩn cấp: {context.get('urgency')}
 - Có đối thủ cạnh tranh: {'Có' if context.get('competition') else 'Không'}
-- Khách chủ động yêu cầu: {'Có' if context.get('customerRequestedQuote') else 'Không'}
-- Hạn chót cần chốt: {context.get('deadlineDays')} ngày
+- Deadline chốt đơn: {context.get('deadlineDays')} ngày
 
-5. NHÂN VIÊN KINH DOANH:
+5. NHÂN VIÊN KINH DOANH (SALES):
 - Kinh nghiệm: {sales.get('experienceYears')} năm
-- Tỷ lệ chốt đơn TB: {sales.get('winRate') * 100}%
+- Tỷ lệ chốt đơn trung bình: {sales.get('winRate') * 100}%
 - Phong độ gần đây: {sales.get('recentPerformance')}
 
 {'6. TIN NHẮN TỪ KHÁCH HÀNG: "' + data.get('customerMessage') + '"' if data.get('customerMessage') else ''}
 
 ### Yêu Cầu Phân Tích (Ngắn gọn & Trực diện):
-1. Phân tích Negotiation Room dựa trên giá sàn.
-2. Kiểm tra Price Tiers và tìm cơ hội Upsell.
-3. Chỉ đưa ra tối đa 3 insight quan trọng nhất và 3 hành động thực tế nhất.
-4. Tránh viết dài dòng, sử dụng ngôn ngữ quyết đoán.
+1. Phân tích Negotiation Room (Dư địa đàm phán) dựa trên giá sàn và giá đang chào.
+2. Kiểm tra Price Tiers và tìm cơ hội bán thêm (Upsell).
+3. Đưa ra tối đa 3 insight quan trọng và 3 hành động cụ thể cho Sales.
+4. Sử dụng ngôn ngữ quyết đoán, chuyên nghiệp.
 
-Trả về JSON:
+Trả về kết quả duy nhất dưới định dạng JSON sau:
 {{
   "win_probability": "0-100%",
   "risk_score": "low/medium/high",

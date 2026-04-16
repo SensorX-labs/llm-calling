@@ -1,46 +1,54 @@
-from typing import Dict, Optional, Any
 from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
 
 class CustomerData(BaseModel):
-    isExisting: bool
-    totalOrders: int
-    lastOrderDaysAgo: int
-    avgOrderValue: float
-    paymentBehavior: str  # on_time | late | bad
-    relationshipLevel: str  # low | medium | high
+    # hồ sơ khách hàng
+    isExisting: bool      # khách cũ?
+    totalOrders: int      # tổng đơn
+    lastOrderDaysAgo: int # ngày đơn cuối
+    avgOrderValue: float  # giá trị trung bình
+    paymentBehavior: str  # thanh toán: on_time | late | bad
+    relationshipLevel: str # thân thiết: low | medium | high
 
 class PriceTier(BaseModel):
-    quantity: int
-    price: float
+    # giá theo lô
+    quantity: int # mốc số lượng
+    price: float # giá tương ứng
 
 class PricingData(BaseModel):
+    # thông tin giá báo
     totalAmount: float
-    suggestedPrice: float
-    floorPrice: float
-    priceTiers: Optional[list[PriceTier]] = []  # Danh sách các mức giá theo số lượng
+    suggestedPrice: float       # giá đề xuất
+    floorPrice: float           # giá sàn
+    priceTiers: Optional[List[PriceTier]] = [] # bảng giá lô
     discountPercent: float
-    avgMargin: float
+    avgMargin: float            # biên lợi nhuận
     priceCompetitiveness: str
 
 class QuoteStructure(BaseModel):
+    # cấu trúc báo giá
     itemCount: int
+    totalItemCount: Optional[int] = 0 # tổng số lượng sp
     hasAlternativeOptions: bool
     hasBundle: bool
-    complexity: str  # low | medium | high
+    complexity: str
 
 class ContextData(BaseModel):
-    urgency: str  # low | medium | high
-    competition: bool
+    # ngữ cảnh chốt đơn
+    urgency: str # độ gấp
+    competition: bool # có đối thủ?
     customerRequestedQuote: bool
     deadlineDays: int
 
 class SalesData(BaseModel):
+    # năng lực sales
     experienceYears: int
     winRate: float
-    recentPerformance: str  # up | stable | down
+    recentPerformance: str
 
 class QuotationAnalysisRequest(BaseModel):
-    quoteId: str = Field(..., description="ID định danh báo giá từ hệ thống C#")
+    # yêu cầu phân tích tổng thể
+    quoteId: str = Field(..., description="id duy nhất báo giá")
     customer: CustomerData
     pricing: PricingData
     quote: QuoteStructure

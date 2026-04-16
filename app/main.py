@@ -1,18 +1,16 @@
-"""FastAPI application entry point."""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.apis.routes import router
 from app.core.config import settings
 
-# Create FastAPI app
+# khởi tạo app
 app = FastAPI(
     title=settings.API_TITLE,
     version=settings.API_VERSION,
-    debug=settings.DEBUG,
 )
 
-# Add CORS middleware
+# cấu hình cors
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,26 +19,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routes
-app.include_router(router, prefix="/api/v1", tags=["llm"])
-
-
-@app.get("/")
-async def root():
-    """Root endpoint."""
-    return {
-        "message": "LLM Calling Service",
-        "version": settings.API_VERSION,
-        "docs": "/docs",
-    }
-
+# đăng ký route
+app.include_router(router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn
-
+    # chạy server
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=settings.DEBUG,
+        reload=settings.DEBUG
     )

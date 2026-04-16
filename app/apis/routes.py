@@ -7,25 +7,23 @@ from app.services.analysis_service import AnalysisService
 
 router = APIRouter()
 
-# Khởi tạo Service (Lớp này sẽ tự gọi sang Repository bên dưới)
+# khởi tạo service chính
 analysis_service = AnalysisService()
 
 @router.get("/analysis/{quote_id}")
 async def get_quote_analysis(quote_id: str):
-    """
-    Next.js gọi API này để lấy kết quả từ DB.
-    """
+    # lấy kết quả phân tích cho nextjs
     analysis = analysis_service.get_existing_analysis(quote_id)
     if not analysis:
         return {
             "status": "pending",
-            "message": "AI đang phân tích hoặc chưa có dữ liệu cho Quote ID này."
+            "message": "đang xử lý hoặc id không tồn tại"
         }
     return {"status": "success", "analysis": analysis}
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
-    """Health check endpoint."""
+    # kiểm tra server sống hay chết
     return {
         "status": "healthy",
         "version": settings.API_VERSION,
@@ -33,14 +31,11 @@ async def health_check():
 
 @router.post("/analyze-quote")
 async def analyze_quote(request: QuotationAnalysisRequest, background_tasks: BackgroundTasks):
-    """
-    Hệ thống C# gọi API này để đẩy dữ liệu báo giá sang.
-    """
-    # Giao việc cho AI làm ngầm
+    # nhận data từ c#, xử lý ngầm và trả về ngay
     background_tasks.add_task(analysis_service.process_quotation, request.model_dump())
     
     return {
         "status": "processing",
         "quote_id": request.quoteId,
-        "message": "Yêu cầu đã được tiếp nhận và đang xử lý ngầm."
+        "message": "đã nhận, đang xử lý ngầm"
     }
