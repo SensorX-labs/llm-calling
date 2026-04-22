@@ -1,13 +1,14 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from typing import Optional
 
 from app.core.config import settings
 
-# cổng giao tiếp với gemini
 class LLMClient:
     def __init__(self):
-        genai.configure(api_key=settings.LLM_API_KEY)
-        self.default_model_name = "gemini-3-flash-preview"
+        # Khởi tạo client với API Key
+        self.client = genai.Client(api_key=settings.LLM_API_KEY)
+        self.default_model_name = settings.LLM_MODEL or "gemini-2.0-flash"
 
     async def complete(
         self,
@@ -20,14 +21,13 @@ class LLMClient:
         temp = temperature if temperature is not None else settings.TEMPERATURE
 
         try:
-            # Sử dụng các tham số trực tiếp và bật JSON mode
-            model_instance = genai.GenerativeModel(model_name)
-            
-            response = await model_instance.generate_content_async(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
+            response = await self.client.aio.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
                     temperature=temp,
                     response_mime_type="application/json",
+                    max_output_tokens=max_tokens or settings.MAX_TOKENS
                 )
             )
 

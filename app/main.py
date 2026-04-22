@@ -1,8 +1,10 @@
+import threading
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.apis.routes import router
 from app.core.config import settings
+from app.consumers.mq_consumer import start_consumer
 
 # khởi tạo app
 app = FastAPI(
@@ -18,6 +20,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Đăng ký sự kiện startup để chạy RabbitMQ Consumer ngầm
+@app.on_event("startup")
+def startup_event():
+    # Chạy consumer trong một thread riêng để không làm treo Server
+    consumer_thread = threading.Thread(target=start_consumer, daemon=True)
+    consumer_thread.start()
+    print(" [info] RabbitMQ Consumer đã được khởi động ngầm.")
 
 # đăng ký route
 app.include_router(router, prefix="/api/v1")

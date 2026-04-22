@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     RABBITMQ_QUEUE: str = "quotation.analyze"
 
     # postgresql
-    DATABASE_URL: str = "postgresql://user_admin:password_123@localhost:5432/quote_analysis"
+    DATABASE_URL: str = "postgresql://postgres:sk1234@localhost:5432/quote_analysis"
 
     class Config:
         env_file = ".env"

@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 from app.models.analysis import Base, QuoteAnalysisModel
@@ -8,10 +8,32 @@ from app.models.analysis import Base, QuoteAnalysisModel
 class AnalysisRepository:
     # quản lý đọc ghi vào postgres
     def __init__(self):
-        # kết nối db và tự tạo bảng nếu chưa có
+        # 1. Tạo database nếu chưa có
+        self._ensure_database_exists()
+        
+        # 2. kết nối db chính và tự tạo bảng nếu chưa có
         self.engine = create_engine(settings.DATABASE_URL)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
+
+    def _ensure_database_exists(self):
+        # Kết nối tới database mặc định 'postgres' để kiểm tra và tạo database mới
+        # Tách URL để lấy thông tin kết nối cơ bản
+        base_url = settings.DATABASE_URL.rsplit('/', 1)[0] + "/postgres"
+        db_name = settings.DATABASE_URL.rsplit('/', 1)[-1]
+        
+        temp_engine = create_engine(base_url, isolation_level="AUTOCOMMIT")
+        with temp_engine.connect() as conn:
+            # Kiểm tra database tồn tại
+            result = conn.execute(
+                text(f"SELECT 1 FROM pg_database WHERE datname='{db_name}'")
+            ).fetchone()
+            
+            if not result:
+                print(f"[*] Database '{db_name}' chưa tồn tại. Đang tiến hành tạo mới...")
+                conn.execute(text(f"CREATE DATABASE {db_name}"))
+                print(f"[ok] Đã tạo thành công database '{db_name}'")
+        temp_engine.dispose()
 
     # thêm mới hoặc cập nhật kết quả vào db
     def upsert_analysis(self, quote_id: str, analysis: dict):

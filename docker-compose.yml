@@ -7,8 +7,8 @@ services:
     container_name: ai_service_db
     restart: always
     environment:
-      POSTGRES_USER: user_admin
-      POSTGRES_PASSWORD: password_123
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sk1234
       POSTGRES_DB: quote_analysis
     ports:
       - "5432:5432"
