@@ -70,7 +70,7 @@ def start_consumer():
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
 
-        EXCHANGE_NAME = 'SensorX.Master.Application.IntegrationEvents:QuoteAnalysisDataBundle'
+        EXCHANGE_NAME = 'quote-analysis-bundle'
         QUEUE_NAME = 'ai_service_analysis_queue'
 
         channel.exchange_declare(exchange=EXCHANGE_NAME, exchange_type='fanout', durable=True)

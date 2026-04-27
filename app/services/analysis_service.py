@@ -30,6 +30,14 @@ class AnalysisService:
 
             # 3. parse nội dung json
             content = result.get("content", "{}")
+            
+            # Làm sạch chuỗi nếu AI trả về kèm markdown backticks
+            if "```" in content:
+                content = content.split("```")[1]
+                if content.startswith("json"):
+                    content = content[4:]
+            content = content.strip()
+            
             analysis = json.loads(content)
             print("[*] giải mã json thành công")
             
