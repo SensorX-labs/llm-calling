@@ -1,10 +1,10 @@
 # 🚀 Quote Analysis Service (LLM-Based)
 
-Dịch vụ phân tích báo giá thông minh sử dụng **Google Gemini 2.5 Flash**. Hệ thống sử dụng phương pháp **Feature Engineering for LLMs** để đánh giá tỷ lệ chốt đơn (Win Probability) và đưa ra các chỉ dẫn chiến lược cho bộ phận Sales.
+Dịch vụ phân tích báo giá thông minh sử dụng **9router** theo chuẩn **OpenAI-compatible API**. Hệ thống sử dụng phương pháp **Feature Engineering for LLMs** để đánh giá tỷ lệ chốt đơn (Win Probability) và đưa ra các chỉ dẫn chiến lược cho bộ phận Sales.
 
 ## 🛠 Tech Stack
 - **Backend:** FastAPI (Python)
-- **LLM:** Google Gemini 2.5 Flash (Generative AI)
+- **LLM Gateway:** 9router
 - **Validation:** Pydantic V2
 - **Config:** Pydantic Settings
 
@@ -15,11 +15,12 @@ Dịch vụ phân tích báo giá thông minh sử dụng **Google Gemini 2.5 Fl
    pip install -r requirements.txt
    ```
 
-2. **Cấu hình API Key:**
-   Mở file `.env` và điền Gemini API Key của bạn:
+2. **Cấu hình 9router:**
+   Mở file `.env` và cấu hình endpoint 9router:
    ```env
    LLM_API_KEY=your_key_here
-   LLM_MODEL=gemini-2.5-flash
+   LLM_MODEL=auto
+   LLM_API_BASE=http://localhost:3001
    ```
 
 3. **Khởi chạy Server:**

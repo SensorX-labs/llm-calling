@@ -1,30 +1,35 @@
-import google.generativeai as genai
 import os
+
+import requests
 from dotenv import load_dotenv
 
-# load môi trường để lấy api key
 load_dotenv()
-api_key = os.getenv("LLM_API_KEY")
+
 
 def list_my_models():
-    if not api_key:
-        print("[!] Lỗi: Không tìm thấy LLM_API_KEY trong file .env")
-        return
+    base_url = os.getenv("LLM_API_BASE", "http://localhost:3001").rstrip("/")
+    api_key = os.getenv("LLM_API_KEY", "")
 
-    genai.configure(api_key=api_key)
-    print("--- CÁC MODEL GEMINI BẠN CÓ QUYỀN TRUY CẬP ---")
+    headers = {}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+
+    print("--- CAC MODEL 9ROUTER DANG CO ---")
     try:
-        found = False
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods:
-                print(f"> {m.name}")
-                found = True
-        
-        if not found:
-            print("[?] Không tìm thấy model nào hỗ trợ generateContent.")
-            
+        response = requests.get(f"{base_url}/v1/models", headers=headers, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        models = data.get("data", [])
+
+        if not models:
+            print("[?] Khong tim thay model nao.")
+            return
+
+        for model in models:
+            print(f"> {model.get('id', 'unknown')}")
     except Exception as e:
-        print(f"[!] Lỗi khi gọi API: {str(e)}")
+        print(f"[!] Loi khi goi 9router: {e}")
+
 
 if __name__ == "__main__":
     list_my_models()

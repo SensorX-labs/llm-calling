@@ -10,10 +10,10 @@ class Settings(BaseSettings):
     API_VERSION: str = "1.0.0"
     DEBUG: bool = False
 
-    # kết nối gemini
+    # kết nối 9router
     LLM_API_KEY: str = ""
-    LLM_MODEL: str = "gemma-4-31b-it"
-    LLM_API_BASE: str = "https://generativelanguage.googleapis.com/v1beta"
+    LLM_MODEL: str = "gh/gpt-4o-mini"
+    LLM_API_BASE: str = "http://localhost:3001"
     LLM_TIMEOUT: int = 30
 
     # tham số ai

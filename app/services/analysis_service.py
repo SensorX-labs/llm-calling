@@ -21,12 +21,12 @@ class AnalysisService:
             prompt = self.prompt_builder.build_quotation_prompt(data)
             print("[*] đã dựng xong prompt cho ai")
 
-            # 2. gọi gemini
+            # 2. gọi 9router
             result = await self.llm_client.complete(prompt=prompt, temperature=0.2)
             if result.get("status") == "error":
-                print(f"[!] lỗi kết nối gemini: {result.get('message')}")
+                print(f"[!] lỗi kết nối 9router: {result.get('message')}")
                 return result
-            print("[*] đã nhận phản hồi từ gemini")
+            print("[*] đã nhận phản hồi từ 9router")
 
             # 3. parse nội dung json
             content = result.get("content", "{}")
