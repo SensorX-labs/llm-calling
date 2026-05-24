@@ -8,7 +8,7 @@ class Settings(BaseSettings):
 
     LLM_API_KEY: str = ""
     LLM_MODEL: str = "gh/gpt-4o-mini"
-    LLM_API_BASE: str = "http://9router:3001"
+    LLM_API_BASE: str = "http://9router:20128"
     LLM_TIMEOUT: int = 30
 
     MAX_TOKENS: int = 2000

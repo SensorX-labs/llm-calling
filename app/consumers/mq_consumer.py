@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import sys
+import time
 from urllib.parse import urlparse
 
 import pika
@@ -59,27 +60,33 @@ def start_consumer():
     _loop = asyncio.new_event_loop()
     asyncio.set_event_loop(_loop)
 
-    try:
-        rabbitmq_url = settings.RABBITMQ_URL
-        parameters = pika.URLParameters(rabbitmq_url)
-        connection = pika.BlockingConnection(parameters)
-        channel = connection.channel()
+    exchange_name = "quote-analysis-bundle"
+    queue_name = "ai_service_analysis_queue"
+    retry_seconds = 5
 
-        exchange_name = "quote-analysis-bundle"
-        queue_name = "ai_service_analysis_queue"
+    while True:
+        try:
+            rabbitmq_url = settings.RABBITMQ_URL
+            parameters = pika.URLParameters(rabbitmq_url)
+            connection = pika.BlockingConnection(parameters)
+            channel = connection.channel()
 
-        channel.exchange_declare(exchange=exchange_name, exchange_type="fanout", durable=True)
-        channel.queue_declare(queue=queue_name, durable=True)
-        channel.queue_bind(exchange=exchange_name, queue=queue_name)
+            channel.exchange_declare(exchange=exchange_name, exchange_type="fanout", durable=True)
+            channel.queue_declare(queue=queue_name, durable=True)
+            channel.queue_bind(exchange=exchange_name, queue=queue_name)
 
-        print(" [*] Background Consumer da san sang va dang doi tin nhan...")
+            print(" [*] Background Consumer da san sang va dang doi tin nhan...")
 
-        channel.basic_qos(prefetch_count=1)
-        channel.basic_consume(queue=queue_name, on_message_callback=on_message_received)
-        channel.start_consuming()
-    except Exception as e:
-        host = urlparse(settings.RABBITMQ_URL).hostname or "unknown"
-        print(f" [!] Khong the khoi dong Consumer toi RabbitMQ host '{host}': {e!r}")
+            channel.basic_qos(prefetch_count=1)
+            channel.basic_consume(queue=queue_name, on_message_callback=on_message_received)
+            channel.start_consuming()
+        except Exception as e:
+            host = urlparse(settings.RABBITMQ_URL).hostname or "unknown"
+            print(
+                f" [!] RabbitMQ host '{host}' chua san sang hoac bi ngat ket noi: {e!r}. "
+                f"Thu lai sau {retry_seconds} giay..."
+            )
+            time.sleep(retry_seconds)
 
 
 if __name__ == "__main__":
