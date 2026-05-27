@@ -1,104 +1,108 @@
-# xây dựng mẫu prompt cho AI
+# xay dung mau prompt cho AI
 class PromptBuilder:
     def _format_number(self, value):
-        """Hàm hỗ trợ ép kiểu và định dạng số an toàn"""
+        """Ham ho tro ep kieu va dinh dang so an toan"""
         try:
-            if value is None: return "0"
+            if value is None:
+                return "0"
             return f"{float(value):,.0f}"
         except (ValueError, TypeError):
             return str(value)
 
     def build_quotation_prompt(self, data: dict) -> str:
-        customer = data.get('customer', {})
-        staff = data.get('staff', {})
-        quote = data.get('quote', {})
-        items = quote.get('items', [])
+        customer = data.get("customer", {})
+        staff = data.get("staff", {})
+        quote = data.get("quote", {})
+        items = quote.get("items", [])
 
-        # Tính toán Win Rate của khách hàng dựa trên lịch sử
-        total_quotes = customer.get('totalQuotes', 0)
-        accepted_quotes = customer.get('acceptedQuotes', 0)
+        total_quotes = customer.get("totalQuotes", 0)
+        accepted_quotes = customer.get("acceptedQuotes", 0)
         customer_win_rate = (accepted_quotes / total_quotes * 100) if total_quotes > 0 else 0
 
-        # Xử lý price tiers từ items
         tiers_info = []
         for item in items:
-            p_name = item.get('productName', 'Sản phẩm')
-            tiers = item.get('priceTiers', [])
+            product_name = item.get("productName", "San pham")
+            tiers = item.get("priceTiers", [])
             if tiers:
-                tiers_info.append(f"  • {p_name}:")
-                for t in tiers:
-                    min_qty = t.get('minQuantity', 0)
-                    price = self._format_number(t.get('price', 0))
-                    tiers_info.append(f"    + SL >= {min_qty}: {price} VNĐ")
-        
-        tiers_str = "\n".join(tiers_info) if tiers_info else "  (Không có thông tin Tiers)"
+                tiers_info.append(f"  - {product_name}:")
+                for tier in tiers:
+                    min_qty = tier.get("minQuantity", 0)
+                    price = self._format_number(tier.get("price", 0))
+                    tiers_info.append(f"    + SL >= {min_qty}: {price} VND")
 
-        # Danh sách sản phẩm chi tiết
+        tiers_str = "\n".join(tiers_info) if tiers_info else "  (Khong co thong tin tiers)"
+
         items_detail = []
         for item in items:
-            qty = item.get('quantity', 0)
-            quoted_price = item.get('quotedUnitPrice', 0)
-            suggested = item.get('suggestedPrice', 0)
-            floor = item.get('floorPrice', 0)
-            
+            qty = item.get("quantity", 0)
+            quoted_price = item.get("quotedUnitPrice", 0)
+            suggested = item.get("suggestedPrice", 0)
+            floor = item.get("floorPrice", 0)
+
             items_detail.append(
-                f"  • {item.get('productName')} (Mã: {item.get('productCode')})\n"
-                f"    - Số lượng: {qty} {item.get('unit')}\n"
-                f"    - Giá đang chào: {self._format_number(quoted_price)} VNĐ\n"
-                f"    - Giá đề xuất: {self._format_number(suggested)} VNĐ\n"
-                f"    - Giá sàn: {self._format_number(floor)} VNĐ"
+                f"  - {item.get('productName')} (Ma: {item.get('productCode')})\n"
+                f"    So luong: {qty} {item.get('unit')}\n"
+                f"    Gia dang chao: {self._format_number(quoted_price)} VND\n"
+                f"    Gia de xuat: {self._format_number(suggested)} VND\n"
+                f"    Gia san: {self._format_number(floor)} VND"
             )
 
         prompt = f"""
-          Hãy đóng vai một chuyên gia phân tích kinh doanh (Business Analyst) và cố vấn chiến lược bán hàng. 
-          Nhiệm vụ của bạn là phân tích bản báo giá dưới đây và đưa ra dự báo về khả năng chốt đơn thành công cũng như các lời khuyên thực chiến.
+Ban la chuyen gia phan tich bao gia B2B.
+Muc tieu: danh gia nhanh muc do deal va de xuat hanh dong ngan gon, thuc dung.
 
-          DỮ LIỆU BÁO GIÁ CHI TIẾT:
+QUY TAC BAT BUOC VE DO DAI:
+- reasoning toi da 320 ky tu.
+- strategy toi da 320 ky tu.
+- Moi truong chi viet ngan gon, uu tien 2-3 y chinh.
+- Khong viet doan van dai.
+- Khong danh so nhieu tang.
+- Khong lap lai du lieu da co.
 
-          1. THÔNG TIN KHÁCH HÀNG:
-          - Tên: {customer.get('companyName')} (Người nhận: {customer.get('recipientName')})
-          - Lịch sử giao dịch: Đã nhận {total_quotes} báo giá, đã chốt {accepted_quotes} đơn.
-          - Tỷ lệ chốt đơn trong quá khứ: {customer_win_rate:.1f}%
+DU LIEU BAO GIA:
 
-          2. TỔNG QUAN BÁO GIÁ:
-          - Mã báo giá: {data.get('quoteCode')}
-          - Tổng giá trị (đang chào): {self._format_number(quote.get('totalAmount'))} VNĐ
-          - Tổng số lượng sản phẩm: {quote.get('totalQuantity')}
-          - Số loại sản phẩm: {quote.get('itemCount')} mục
-          - Ghi chú: {quote.get('note') or "Không có"}
+1. KHACH HANG
+- Ten cong ty: {customer.get('companyName')}
+- Nguoi nhan: {customer.get('recipientName') or 'Khong co'}
+- Da nhan {total_quotes} bao gia, da chot {accepted_quotes} don
+- Ty le chot trong qua khu: {customer_win_rate:.1f}%
 
-          3. CHI TIẾT SẢN PHẨM & GIÁ:
-          {chr(10).join(items_detail)}
+2. TONG QUAN BAO GIA
+- Ma bao gia: {data.get('quoteCode')}
+- Tong gia tri dang chao: {self._format_number(quote.get('totalAmount'))} VND
+- Tong so luong san pham: {quote.get('totalQuantity')}
+- So loai san pham: {quote.get('itemCount')}
+- Ghi chu: {quote.get('note') or 'Khong co'}
 
-          4. CHÍNH SÁCH GIÁ THEO SỐ LƯỢNG (PRICE TIERS):
-          {tiers_str}
+3. CHI TIET SAN PHAM VA GIA
+{chr(10).join(items_detail)}
 
-          5. NHÂN VIÊN PHỤ TRÁCH:
-          - Tên: {staff.get('staffName')}
-          - Bộ phận: {staff.get('department')}
-          - Kinh nghiệm: {staff.get('tenureYears', 0)} năm
+4. PRICE TIERS
+{tiers_str}
 
-          ### YÊU CẦU PHÂN TÍCH:
-          Dựa trên sự chênh lệch giữa "Giá đang chào" so với "Giá đề xuất" và "Giá sàn", cùng với lịch sử của khách hàng, hãy thực hiện:
+5. NHAN VIEN PHU TRACH
+- Ten: {staff.get('staffName')}
+- Bo phan: {staff.get('department')}
+- Kinh nghiem: {staff.get('tenureYears', 0)} nam
 
-          1. Phân loại trạng thái (deal_status):
-             - "An toàn": Giá đang chào >= Giá đề xuất.
-             - "Tiềm năng": Giá đang chào nằm giữa Giá đề xuất và Giá sàn.
-             - "Rủi ro": Giá đang chào sát Giá sàn hoặc khách hàng có tỷ lệ chốt đơn thấp.
-             - "Cảnh báo": Giá đang chào dưới Giá sàn.
-             - "Upsell": Nếu khách hàng mua số lượng lớn nhưng chưa đạt mức Tier tiếp theo.
+YEU CAU PHAN TICH:
+- Chon 1 deal_status:
+  - "An toan": gia dang chao >= gia de xuat
+  - "Tiem nang": gia dang chao nam giua gia de xuat va gia san
+  - "Rui ro": gia sat gia san hoac khach co ty le chot thap
+  - "Canh bao": gia dang chao duoi gia san
+  - "Upsell": co co hoi day them theo price tier
+- reasoning: tom tat 2-3 nguyen nhan quan trong nhat.
+- strategy: 2-3 hanh dong ngan, co the lam ngay.
 
-          2. Reasoning (Lập luận): Giải thích lý do chọn trạng thái trên (phân tích sâu về giá và biên độ an toàn).
-          3. Strategy (Chiến lược): 
-             - Nếu giá cao: Cách thuyết phục khách hàng về giá trị.
-             - Nếu giá thấp: Cách bảo vệ biên lợi nhuận.
-             - Gợi ý Upsell/Cross-sell dựa trên Price Tiers nếu khả thi.
-
-          TRẢ VỀ KẾT QUẢ DƯỚI ĐỊNH DẠNG JSON:
-          {{
-            "deal_status": "An toàn | Tiềm năng | Rủi ro | Cảnh báo | Upsell",
-            "reasoning": "Chuỗi văn bản giải thích...",
-            "strategy": "Chuỗi văn bản gợi ý hành động cụ thể..."
-          }}
-          """
+TRA VE DUNG JSON, KHONG GIAI THICH THEM:
+- Khong dung markdown.
+- Khong them text truoc hoac sau JSON.
+- Neu trong reasoning hoac strategy co dau ngoac kep, hay escape dung JSON.
+{{
+  "deal_status": "An toan | Tiem nang | Rui ro | Canh bao | Upsell",
+  "reasoning": "Toi da 320 ky tu, ngan gon va truc tiep.",
+  "strategy": "Toi da 320 ky tu, hanh dong ro rang va ngan gon."
+}}
+"""
         return prompt.strip()
