@@ -19,6 +19,7 @@ class LLMClient:
         max_tokens: Optional[int] = None,
     ) -> dict:
         model_name = model or self.default_model_name
+        endpoint = f"{self.base_url}/v1/chat/completions"
         temp = temperature if temperature is not None else settings.TEMPERATURE
         payload = {
             "model": model_name,
@@ -40,7 +41,7 @@ class LLMClient:
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
-                    f"{self.base_url}/v1/chat/completions",
+                    endpoint,
                     json=payload,
                     headers=headers,
                 )
@@ -48,11 +49,23 @@ class LLMClient:
                     message = self._extract_error_message(response)
                     return {
                         "status": "error",
-                        "message": message,
+                        "message": f"9router HTTP error at {endpoint} with model {model_name}: {message}",
                         "model": model_name,
                     }
 
-            data = response.json()
+            try:
+                data = response.json()
+            except ValueError:
+                body_preview = self._preview_text(response.text)
+                return {
+                    "status": "error",
+                    "message": (
+                        f"9router returned non-JSON response from {endpoint} "
+                        f"with model {model_name}: {body_preview}"
+                    ),
+                    "model": model_name,
+                }
+
             content = (
                 data.get("choices", [{}])[0]
                 .get("message", {})
@@ -60,17 +73,54 @@ class LLMClient:
             )
 
             if not content:
-                return {"status": "error", "message": "9router khong tra ve noi dung", "model": model_name}
+                return {
+                    "status": "error",
+                    "message": (
+                        f"9router returned empty content from {endpoint} "
+                        f"with model {model_name}"
+                    ),
+                    "model": model_name,
+                }
 
             return {
                 "status": "success",
                 "content": content,
                 "model": model_name,
             }
+        except httpx.TimeoutException as e:
+            return {
+                "status": "error",
+                "message": (
+                    f"Timeout when calling 9router at {endpoint} with model {model_name} "
+                    f"(timeout={self.timeout}s): {self._format_exception_message(e)}"
+                ),
+                "model": model_name,
+            }
+        except httpx.ConnectError as e:
+            return {
+                "status": "error",
+                "message": (
+                    f"Cannot connect to 9router at {endpoint} with model {model_name}: "
+                    f"{self._format_exception_message(e)}"
+                ),
+                "model": model_name,
+            }
+        except httpx.HTTPError as e:
+            return {
+                "status": "error",
+                "message": (
+                    f"HTTP client error when calling 9router at {endpoint} with model {model_name}: "
+                    f"{self._format_exception_message(e)}"
+                ),
+                "model": model_name,
+            }
         except Exception as e:
             return {
                 "status": "error",
-                "message": str(e),
+                "message": (
+                    f"Unexpected error when calling 9router at {endpoint} with model {model_name}: "
+                    f"{self._format_exception_message(e)}"
+                ),
                 "model": model_name,
             }
 
@@ -91,3 +141,19 @@ class LLMClient:
         if body:
             return f"{response.status_code} {response.reason_phrase}: {body}"
         return f"{response.status_code} {response.reason_phrase}"
+
+    @staticmethod
+    def _format_exception_message(error: Exception) -> str:
+        message = str(error).strip()
+        if message:
+            return message
+        return error.__class__.__name__
+
+    @staticmethod
+    def _preview_text(text: str, limit: int = 300) -> str:
+        flattened = " ".join(text.split())
+        if not flattened:
+            return "<empty body>"
+        if len(flattened) <= limit:
+            return flattened
+        return flattened[:limit] + "...(truncated)"

@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://postgres:sk1234@db:5432/quote_analysis"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env.local", ".env"),
         case_sensitive=True,
     )
 
